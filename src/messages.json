@@ -1,0 +1,23 @@
+[
+    {
+        "title": "Fix TypeScript errors and improve code quality in dashboard page",
+        "content": "Resolved TypeScript errors by adding 'use client' directive, correcting imports",
+        "recieved": "1 hour ago"
+
+    },
+    {
+        "title": "Add Message interface and fix key prop in message list",
+        "content": "Defined Message interface and used message._id as key prop in message list rendering",
+        "recieved": "2 hours ago"
+    },
+    {
+        "title": "Clean up imports and improve code readability",
+        "content": "Removed unused imports and organized code for better readability",
+        "recieved": "3 days ago"
+    },
+    {
+        "title": "Enhance user feedback with toast notifications",
+        "content": "Added toast notifications for better user feedback on actions",
+        "recieved": "4 minutes ago"
+    }
+]
