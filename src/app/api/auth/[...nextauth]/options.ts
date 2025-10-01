@@ -10,12 +10,16 @@ export const authOptions: NextAuthOptions = {
       id: 'credentials',
       name: 'Credentials',
       credentials: {
-        email: { label: 'Email', type: 'text' },
+        identifier: { label: 'Email or Username', type: 'text' },
         password: { label: 'Password', type: 'password' },
       },
-      async authorize(credentials: any): Promise<any> {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      async authorize(credentials: Record<"identifier" | "password", string> | undefined): Promise<any> {
         await dbConnect();
         try {
+          if (!credentials?.identifier || !credentials?.password) {
+            throw new Error('Identifier and password are required');
+          }
           const user = await UserModel.findOne({
             $or: [
               { email: credentials.identifier },
@@ -23,7 +27,7 @@ export const authOptions: NextAuthOptions = {
             ],
           });
           if (!user) {
-            throw new Error('No user found with this email');
+            throw new Error('No user found with this email or username');
           }
           if (!user.isVerified) {
             throw new Error('Please verify your account before logging in');
@@ -37,8 +41,8 @@ export const authOptions: NextAuthOptions = {
           } else {
             throw new Error('Incorrect password');
           }
-        } catch (err: any) {
-          throw new Error(err);
+        } catch (err: unknown) {
+          throw new Error(String(err));
         }
       },
     }),
