@@ -5,7 +5,22 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import {  useDebounceCallback } from 'usehooks-ts';
+
+function useDebounce(value: string, delay: number) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
 import * as z from 'zod';
 
 import { Button } from '@/components/ui/button';
@@ -28,7 +43,7 @@ export default function SignUpForm() {
   const [usernameMessage, setUsernameMessage] = useState('');
   const [isCheckingUsername, setIsCheckingUsername] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const debounced = useDebounceCallback(setUsername, 300);
+  const debouncedUsername = useDebounce(username, 300);
 
   const router = useRouter();
 
@@ -43,34 +58,33 @@ export default function SignUpForm() {
 
   useEffect(() => {
     const checkUsernameUnique = async () => {
-      if (debounced) {
+      if (debouncedUsername) {
         setIsCheckingUsername(true);
-        setUsernameMessage(''); // Reset message 
+        setUsernameMessage(''); // Reset message
         try {
           const response = await axios.get<ApiResponse>(
-            `/api/check-username-unique?username=${debounced}`
+            `/api/check-username-unique?username=${debouncedUsername}`
           );
-          console.log(response.data);
           setUsernameMessage(response.data.message);
         } catch (error) {
           const axiosError = error as AxiosError<ApiResponse>;
-          console.log("Axios Error", axiosError);
-          setUsernameMessage(axiosError.response?.data.message || 'Error checking username');
+          setUsernameMessage(
+            axiosError.response?.data.message ?? 'Error checking username'
+          );
         } finally {
           setIsCheckingUsername(false);
         }
       }
     };
     checkUsernameUnique();
-  }, [debounced]);
+  }, [debouncedUsername]);
 
   const onSubmit = async (data: z.infer<typeof signUpSchema>) => {
     setIsSubmitting(true);
     try {
       const response = await axios.post<ApiResponse>('/api/sign-up', data);
 
-      toast("Sign Up Failed", { description: response.data.message });
-
+      toast(response.data.message);
 
       router.replace(`/verify/${username}`);
 
@@ -84,9 +98,7 @@ export default function SignUpForm() {
       let errorMessage = axiosError.response?.data.message;
       ('There was a problem with your sign-up. Please try again.');
 
-    //   toast({ 'Sign Up Failed': errorMessage, variant: 'destructive' });
-        toast("Sign Up Failed", { description: errorMessage });
-
+      toast.error('Sign Up Failed', { description: errorMessage });
 
       setIsSubmitting(false);
     }
@@ -113,7 +125,7 @@ export default function SignUpForm() {
                     {...field}
                     onChange={(e) => {
                       field.onChange(e);
-                      debounced(e.target.value);
+                      setUsername(e.target.value);
                     }}
                   />
                   {isCheckingUsername && <Loader2 className="animate-spin" />}
@@ -139,7 +151,7 @@ export default function SignUpForm() {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <Input {...field} name="email" />
-                  <p className='t text-gray-400 text-sm'>We will send you a verification code</p>
+                  <p className='text-muted text-gray-400 text-sm'>We will send you a verification code</p>
                   <FormMessage />
                 </FormItem>
               )}
@@ -180,3 +192,4 @@ export default function SignUpForm() {
     </div>
   );
 }
+

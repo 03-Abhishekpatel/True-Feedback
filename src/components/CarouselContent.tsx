@@ -21,7 +21,7 @@ export default function MessageCarousel() {
                 <Mail className="flex-shrink-0" />
                 <div>
                   <p>{message.content}</p>
-                  <p className="text-xs text-muted-foreground">{message.recieved}</p>
+                  <p className="text-xs text-muted-foreground">{message.received}</p>
                 </div>
               </CardContent>
             </Card>

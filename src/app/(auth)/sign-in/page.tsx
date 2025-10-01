@@ -15,7 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { toast } from 'sonner'
+import { toast } from 'sonner';
 import { signInSchema } from '@/schemas/signInSchema';
 
 export default function SignInForm() {
@@ -28,23 +28,22 @@ export default function SignInForm() {
       password: '',
     },
   });
-
-
   const onSubmit = async (data: z.infer<typeof signInSchema>) => {
     const result = await signIn('credentials', {
-    redirect: false,
-    identifier: data.identifier,   // ✅ match provider field
-    password: data.password,
-  });
-
+      redirect: false,
+      identifier: data.identifier,
+      password: data.password,
+    });
 
     if (result?.error) {
       if (result.error === 'CredentialsSignin') {
-        toast("Login Failed: Incorrect username or password", {description: 'Please try again'});
+        toast.error('Login Failed', { description: 'Incorrect username or password' });
       } else {
-        toast(`Error: ${result.error}`, {description: 'Please try again'});
+        toast.error('Error', { description: result.error });
       }
-    } else if (result?.url) {
+    }
+
+    if (result?.url) {
       router.replace('/dashboard');
     }
   };

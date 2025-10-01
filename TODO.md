@@ -1,0 +1,2 @@
+- [x] Add defaultValues to useForm in verify page to fix controlled/uncontrolled input error
+- [x] Test the fix by running the app and verifying no console error

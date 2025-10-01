@@ -10,12 +10,10 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-// import { useToast } from '@/components/ui/use-toast';
 import { ApiResponse } from '@/types/ApiResponse';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios, { AxiosError } from 'axios';
 import { useParams, useRouter } from 'next/navigation';
-
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { verifySchema } from '@/schemas/verifySchema';
@@ -23,10 +21,11 @@ import { verifySchema } from '@/schemas/verifySchema';
 export default function VerifyAccount() {
   const router = useRouter();
   const params = useParams<{ username: string }>();
-//   const { toast } = useToast();
   const form = useForm<z.infer<typeof verifySchema>>({
     resolver: zodResolver(verifySchema),
-    defaultValues: {code: ""}
+    defaultValues: {
+      code: '',
+    },
   });
 
   const onSubmit = async (data: z.infer<typeof verifySchema>) => {
@@ -35,23 +34,17 @@ export default function VerifyAccount() {
         username: params.username,
         code: data.code,
       });
-      toast.success(response.data.message , { description: 'You can now sign in.'});
-    //   toast({
-    //     title: 'Success',
-    //     description: response.data.message,
-    //   });
+
+      toast(response.data.message);
 
       router.replace('/sign-in');
     } catch (error) {
       const axiosError = error as AxiosError<ApiResponse>;
-      toast.error(axiosError.response?.data.message || 'An error occurred. Please try again.');
-    //   toast({
-    //     title: 'Verification Failed',
-    //     description:
-    //       axiosError.response?.data.message ??
-    //       'An error occurred. Please try again.',
-    //     variant: 'destructive',
-    //   });
+      toast.error('Verification Failed', {
+        description:
+          axiosError.response?.data.message ??
+          'An error occurred. Please try again.',
+      });
     }
   };
 
