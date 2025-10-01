@@ -24,8 +24,8 @@ export async function POST(req: Request) {
           max_tokens: 400,
         });
         break; // success, exit loop
-      } catch (err: any) {
-        if (err.status === 429 && attempt < 3) {
+      } catch (err: unknown) {
+        if ((err as { status?: number }).status === 429 && attempt < 3) {
           console.warn(`Rate limit hit. Retrying in ${attempt} sec...`);
           await delay(1000 * attempt);
         } else {
@@ -42,14 +42,14 @@ export async function POST(req: Request) {
       "What’s your favorite movie?||If you could learn any skill instantly, what would it be?||What’s the best trip you’ve ever taken?";
 
     return NextResponse.json({ text: finalText });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching suggestions:", error);
 
     // fallback response (never let frontend break)
     return NextResponse.json(
       {
         text: "What’s your favorite movie?||If you could learn any skill instantly, what would it be?||What’s the best trip you’ve ever taken?",
-        error: error.message || "Unexpected error",
+        error: error instanceof Error ? error.message : "Unexpected error",
       },
       { status: 200 } // still return success so UI doesn't break
     );
