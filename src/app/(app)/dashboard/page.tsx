@@ -121,7 +121,8 @@ function UserDashboard() {
       <h1 className="text-4xl font-bold mb-4">User Dashboard</h1>
 
       <div className="mb-4">
-        <h2 className="text-lg font-semibold mb-2">Copy Your Unique Link</h2>{' '}
+        <h2 className="text-lg font-semibold mb-2">Copy Your Unique Link </h2>{' '}
+        <p>Open this unique link to send anonimous message in new tab</p>
         <div className="flex items-center">
           <input
             type="text"
