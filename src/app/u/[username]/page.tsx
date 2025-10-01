@@ -82,7 +82,12 @@ export default function SendMessage() {
       setCompletion(response.data.text);
     } catch (error) {
       console.error('Error fetching messages:', error);
-      setError('Failed to fetch suggested messages');
+      const axiosError = error as AxiosError;
+      if (axiosError.response?.status === 429) {
+        setError('Too many requests. Please try again later.');
+      } else {
+        setError('Failed to fetch suggested messages');
+      }
     } finally {
       setIsSuggestLoading(false);
     }
